@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='item.css') }}"
+    />
+  </head>
+  <body class="body">
+    <div class="nav">
+      <li><a href="/dashboard">Home</a></li>
+      <br />
+      <li><a href="/inventory">Inventory</a></li>
+      <br />
+      <li><a href="/departments">Departments</a></li>
+      <br />
+      <li><a href="/targets">Targets</a></li>
+      <br />
+      <li><a href="/sales_plans">Sales Plans</a></li>
+      <br />
+      <li><a href="/logout">Logout</a></li>
+    </div>
+    <div class="main">
+      <h1 class="p-5"><span> Itemized sales perfomance</span></h1>
+      <div class="col_2 p-5 md-2 alerts">
+        <div class="row">
+          <h3>Actions Needed:</h3>
+          <br>
+          <br>
+
+          <!-- sales to prev week warning -->
+          {%if(item_total.total_prev_sales > item_total.total_nxt_sales_proj)%}
+          <h4>
+            ** Need aditional sales of {{"$
+            {:,.2f}".format(item_total.total_prev_sales-item_total.total_nxt_sales_proj)}}
+            to match previous week.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected sales exceeds previous week sales by {{"$
+            {:,.2f}".format(item_total.total_nxt_sales_proj-item_total.total_prev_sales)}}.
+          </h4>
+          {%endif%}
+          <!-- sales to target warning -->
+          {%if(item_total.total_nxt_sales_target >
+          item_total.total_nxt_sales_proj)%}
+          <h4>
+            ** Need aditional sales of
+            <span style="color: red"
+              >{{"$
+              {:,.2f}".format(item_total.total_nxt_sales_target-item_total.total_nxt_sales_proj)}}</span
+            >
+            to match next week target.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected sales exceeds next week target by {{"$
+            {:,.2f}".format(item_total.total_nxt_sales_proj-item_total.total_nxt_sales_target)}}
+          </h4>
+          {%endif%}
+          <!-- shrink to prev week warning -->
+          {%if(item_total.total_prev_shrink >
+          item_total.total_nxt_shrink_proj)%}
+          <h4>
+            ** Next week shrink is {{"$
+            {:,.2f}".format(item_total.total_prev_shrink-item_total.total_nxt_shrink_proj)}}
+            below than previous week.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected shrink exceeds previous week shrink by  <span style="color: red">{{"$
+            {:,.2f}".format(item_total.total_nxt_shrink_proj-item_total.total_prev_shrink)}}.</span></h4>
+          </h4>
+          {%endif%}
+          <!-- shrink to target warning -->
+          {%if(item_total.total_nxt_shrink_target <
+          item_total.total_nxt_shrink_proj)%}
+          <h4>
+            ** Need to cut down shrink by 
+            <span style="color: red"
+              >{{"$
+              {:,.2f}".format(item_total.total_nxt_shrink_proj-item_total.total_nxt_shrink_target)}}</span
+            >
+            to match next week target.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected shrink is {{"$
+            {:,.2f}".format(item_total.total_nxt_shrink_target-item_total.total_nxt_shrink_proj)}} below than target.
+          </h4>
+          {%endif%}
+        </div>
+        </div>
+
+        <div class="col_2 p-5 md-2 mt-3">
+          <div class="row">
+            <h3 class="p-3 text "> <span>{{item.item_desc}}</span></h3>
+            
+            <div class="col">
+              <div>
+                {%if session["flag_code"][-4:]== item.dept_name[0:4] or session["flag_code"] == "mgr_stor" %}
+            {%if item.flag_by%}
+              {%if item.flag_by == session["flag_code"] or session["flag_code"] == "mgr_stor"%}
+              <a class="text-danger btn btn-info m-2 mb-4"href="/unmark_item/{{item.id}}" >marked by {{item.flag_by}} <span class="text-primary">Unmark Item</span> </a>
+              
+              <a  class="text-danger btn btn-warning m-2 mb-4" href="/change_status/{{item.id}}/{{item.status}}"> {{"edit sales" if item.status == "active" else "cancel changes"}}</a>
+              {%endif%}
+              {%else%}
+              <a href="/mark_item/{{item.id}} " class="btn btn-warning m-2 mb-4">Mark Item and Manage sales</a>
+              {%endif%}
+        
+            {%endif%}
+            {%if (session["flag_code"][-4:]== item.dept_name[0:4] or session["flag_code"] == "mgr_stor") and item.status == "edit"%}
+          
+            <form action="/edit_sales/{{item.id}}" method="post">
+              <ul>
+              <li><h4> Cost:  {{"$ {:,.2f}".format(item.cost_old)}}</h4></li>
+              <li><h4> Current stock:  {{item.item_count}}</h4></li>
+              <li><h4> Previous Price:  {{"$ {:,.2f}".format(item.unit_price_old)}}</h4></li>
+              <li><h4>Current Price: $ <input type="number" name="unit_price_new" value={{item.unit_price_new}}> </h4></li>
+              <br>
+              <li><h4> Sales (Last Week): {{item.prev_week_sale}} UNITS</h4></li>
+              <li><h4> Sales Target (Last Week): {{item.prev_week_target}} UNITS</h4></li>
+              <li><h4> Shrink (Last Week): {{item.prev_week_shrink}} UNITS</h4></li>
+              <li><h4> Shrink Target-Bellow (Last Week):{{item.prev_week_shrink_target}} UNITS</h4></li>
+              <br>
+              <li><h4>Sales (Next Week) <input type="number" name="nxt_week_sale_proj" value={{item.nxt_week_sale_proj}}> UNITS</h4></li>
+              <li><h4> Sales Target (Next Week):{{item.nxt_week_target}} UNITS</h4></li>
+              <li><h4>Shrink (Next Week): <input type="number" name="nxt_week_shrink_proj" value={{item.nxt_week_shrink_proj}}> UNITS</h4></li>
+              <li><h4> Shrink Target-Bellow (Next Week): {{item.nxt_week_shrink_target}}UNITS</h4></li> 
+              <li><h4>Sales Plan</h4><textarea value ={{item.sales_plan}} name="sales_plan" id="sales_plan" cols="56" rows="10"></textarea></li>  
+              </ul>
+             <input style="width:10rem;" class="btn btn-primary ms-3" type="submit" value="Apply changes">
+            </form>
+            {%else%}
+            <div>
+               <ul>
+                <li><h4> Cost:  {{"$ {:,.2f}".format(item.cost_old)}}</h4></li>
+                <li><h4> Current stock:  {{item.item_count}}</h4></li>
+                <li><h4> Previous Price:  {{"$ {:,.2f}".format(item.unit_price_old)}}</h4></li>
+                <li><h4> Current Price:  {{"$ {:,.2f}".format(item.unit_price_new)}} </h4></li>
+              <br>
+                <li><h4> Sales (Last Week): {{item.prev_week_sale}} UNITS</h4></li>
+                <li><h4> Sales Target (Last Week): {{item.prev_week_target}} UNITS</h4></li>
+                <li><h4> Shrink (Last Week): {{item.prev_week_shrink}} UNITS</h4></li>
+                <li><h4> Shrink Target-Bellow (Last Week):{{item.prev_week_shrink_target}} UNITS</h4></li>
+              <br>
+                <li><h4> Sales (Next Week): {{item.nxt_week_sale_proj}}UNITS</h4></li>
+                <li><h4> Sales Target (Next Week):{{item.nxt_week_target}} UNITS</h4></li>
+                <li><h4> Shrink (Next Week):{{item.nxt_week_shrink_proj}} UNITS</h4></li>
+                <li><h4> Shrink Target-Bellow (Next Week): {{item.nxt_week_shrink_target}}UNITS</h4></li> 
+                {%if item.sales_plan != none%}
+                <li><h4>Sales plan for next week:</h4><p>{{item.sales_plan}}</p></li>
+                {%endif%}  
+            </ul>
+
+            </div>
+
+            {%endif%}
+
+          </div>
+          <br>
+            </div>
+            <div class="col">
+              <div class="chart-containe m-5">
+
+                  <canvas
+                    id="myChart1"
+                  ></canvas>
+              </div>
+            </div>
+          </div>
+          
+          
+        </div>
+
+      </div>
+      
+      
+
+    {%block javascript%}
+
+    <script>
+      const item_total_js = JSON.parse({{ item_total_js | tojson}});
+      
+      const labels = ["Previous week","next week"];
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Sales',
+            data: [item_total_js.total_prev_sales,item_total_js.total_nxt_sales_proj],
+            borderColor: 'hsl(244, 100%, 14%)',
+            backgroundColor: 'hsl(244, 100%, 14% ,78%)',
+            type: 'bar',
+            order: 1
+            
+          },
+
+          {
+            label: 'Shrink',
+            data: [item_total_js.total_prev_shrink,item_total_js.total_nxt_shrink_proj],
+            borderColor: 'hsl(0, 75%, 54%)',
+            backgroundColor: 'hsl(0, 75%, 54% ,75%)',
+            type: 'bar',
+            order: 1
+          },
+
+          {
+            label: 'Sales Target',
+            data: [item_total_js.total_prev_sales_target,item_total_js.total_nxt_sales_target],
+            borderColor:'hsl(196, 96%, 33%)',
+            backgroundColor: 'hsl(196, 96%, 33% ,50%)',
+            stack: 'combined',
+            
+            order: 0
+            
+
+          },
+          {
+            label: 'Shrink Target',
+            data: [item_total_js.total_prev_shrink_target,item_total_js.total_nxt_shrink_target],
+            borderColor:'hsl(54, 73%, 51%)',
+            backgroundColor: 'hsl(54, 73%, 51%)',
+            stack: 'combined',
+            order: 0
+            
+          }
+        ]
+      };
+      
+
+
+
+      const ctx1 = document.getElementById('myChart1');
+            const myChart1 = new Chart(ctx1, {
+              type: 'line',
+              data: data,
+              options: {
+                responsive: true,
+                interaction: {
+                  intersect: true,
+                  step:true,
+                  axis: 'x'
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text:"Sales/ Shrink position vs Targets ($)",
+                    font:{
+
+                      size:25
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    stacked: false
+                  }
+                }
+              },
+            });
+
+    
+    </script>
+    {%endblock%}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style_wall.css') }}"
+    />
+  </head>
+  <body class="body">
+    <div class="nav">
+      <li><a href="/dashboard">Home</a></li>
+      <br />
+      <li><a href="/inventory">Inventory</a></li>
+      <br />
+      <li><a href="/departments">Departments</a></li>
+      <br />
+      <li><a href="/targets">Targets</a></li>
+      <br />
+      <li><a href="/sales_plans">Sales Plans</a></li>
+      <br />
+      <li><a href="/logout">Logout</a></li>
+    </div>
+    <div class="main md-2">
+      <h1 class="p-5"><span> Inventory</span></h1>
+      <div>
+        <select
+          class="form-select w-25 ms-5"
+          aria-label="Default select example"
+          onchange="location = this.value;"
+        >
+          {%if dept_id%}
+          <option value="/inventory/dept/{{depts.id}}">
+            {{depts.dept_name}}
+          </option>
+          {%else%}
+          <option selected>--Select Department--</option>
+          {%for dept in depts%}
+          <option value="/inventory/dept/{{dept.id}}">
+            {{dept.dept_name}}
+          </option>
+          {%endfor%} {%endif%}
+        </select>
+        <br />
+        <a href="/inventory" class="btn btn-warning ms-5 mb-3">all depts</a>
+        {%if dept_id%}
+
+        <select
+          class="form-select w-25 ms-5"
+          aria-label="Default select example"
+          onchange="location = this.value;"
+        >
+          {%if cat_id%}
+          <option value="/inventory/dept/{{dept_id}}/{{cats.id}}">
+            {{cats.cat_name}}
+          </option>
+          {%else%}
+          <option selected>-- filter by category --</option>
+          {%for cat in cats%}
+          <option value="/inventory/dept/{{dept_id}}/{{cat.id}}">
+            {{cat.cat_name}}
+          </option>
+          {%endfor%} {%endif%}
+        </select>
+        <br />
+        <a href="/inventory/dept/{{dept_id}}" class="btn btn-warning ms-5 mb-5"
+          >all selected department categories</a
+        >
+        {%endif%}
+      </div>
+      <!-- JavaScript Bundle with Popper -->
+      <table
+        class="table table-bordered m-5 table-striped table-hover table-light "
+      >
+        <thead style=" position: sticky; top: 0;">
+          <th style="max-width: 20px; overflow:hidden">item id</th>
+          <th style="max-width: 25px; overflow:hidden">item decs</th>
+          <th style="max-width: 25px; overflow:hidden">category</th>
+          <th style="max-width: 25px; overflow:hidden">department</th>
+          <th style="max-width: 20px; overflow:hidden">item count</th>
+          <th style="max-width: 25px; overflow:hidden">item cost ($)</th>
+          <th style="max-width: 25px; overflow:hidden">item old price ($)</th>
+          <th style="max-width: 25px; overflow:hidden">item current price ($)</th>
+          <th style="max-width: 20px; overflow:hidden">Prev. week sales</th>
+          <th style="max-width: 20px; overflow:hidden">Prev. sales target</th>
+          <th style="max-width: 20px; overflow:hidden">Prev. week shrink</th>
+          <th style="max-width: 20px; overflow:hidden">Prev. shrink target (below)</th>
+          <th style="max-width: 20px; overflow:hidden">Next. week sales (proj:)</th>
+          <th style="max-width: 20px; overflow:hidden">Next. sales target</th>
+          <th style="max-width: 20px; overflow:hidden">Next. week shrink (proj:)</th>
+          <th style="max-width: 20px; overflow:hidden">Next. shrink target (below)</th>
+          <th>actions</th>
+        </thead>
+        <tbody>
+          {%for item in items%}
+          <tr style="font-weight:{{ "bold" if item.flag_by else "none" }};">
+            <td>{{item.id}}</td>
+            <td><a href="/view_item/{{item.id}}">{{item.item_desc}}</a> </td>
+            <td>{{item.cat_name}}</td>
+            <td>{{item.dept_name}}</td>
+            <td>{{item.item_count}}</td>
+            <td>{{"$ {:,.2f}".format(item.cost_old)}}</td>
+            <td>{{"$ {:,.2f}".format(item.unit_price_old)}}</td>
+            <td>{{"$ {:,.2f}".format(item.unit_price_new)}}</td>
+            <td style="color:{{ "red" if item.prev_week_sale< item.prev_week_target else "none" }}">{{item.prev_week_sale}}</td>
+            <td>{{item.prev_week_target}}</td>
+            <td style="color:{{ "red" if item.prev_week_shrink_target< item.prev_week_shrink else "none" }}">{{item.prev_week_shrink}}</td>
+            <td>{{item.prev_week_shrink_target}}</td>
+            <td style="color:{{ "red" if item.nxt_week_sale_proj< item.nxt_week_target else "none" }}">{{item.nxt_week_sale_proj}}</td>
+            <td>{{item.nxt_week_target}}</td>
+            <td style="color:{{ "red" if item.nxt_week_shrink_target< item.nxt_week_shrink_proj else "none" }}">{{item.nxt_week_shrink_proj}}</td>
+            <td>{{item.nxt_week_shrink_target}}</td>
+
+            <td>{%if session["flag_code"][-4:]== item.dept_name[0:4] or session["flag_code"] == "mgr_stor" %}
+              
+              {%if item.flag_by%}
+              <p class="text-info" >marked by {{item.flag_by}}</p>
+              {%if item.flag_by == session["flag_code"] or session["flag_code"] =="mgr_stor" %}
+              <a class="text-danger btn btn-warning"href="/unmark_item/{{item.id}}">Unmark Item</a>
+              {%endif%}
+              {%else%}
+              <a href="/mark_item/{{item.id}}">Mark Item</a>
+              {%endif%}
+              {%else%}
+              <p class="text-warning">display only</p>
+              {%endif%}
+            </td>
+          </tr>
+
+          {%endfor%}
+        </tbody>
+      </table>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

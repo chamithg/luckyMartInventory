@@ -1,0 +1,4 @@
+ add the individual sales chart
+ implement mark and edit buttons in individual
+ add sales plan
+ 

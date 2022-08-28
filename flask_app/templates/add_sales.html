@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style_wall.css') }}"
+    />
+  </head>
+  <body>
+    <h1 class="m-5">Add Sales</h1>
+    <div class="section m-5">
+      <div class="row">
+        <div class="col">
+          <h3>Id : {{item.id}}</h3>
+          <h3>Name: {{item.item_desc}}</h3>
+          <h3>Count: {{item.item_count}}</h3>
+          <h3>Cost: {{item.cost_old}}</h3>
+          <h3>old price: {{item.unit_price_old}}</h3>
+          <h3>new Price{{item.unit_price_new}}</h3>
+        </div>
+        <div class="col">
+          <form action="/edit_sales" method="post">
+            <input type="number" name="inv_id" value="{{item.id}}" />
+            <h3>prev week</h3>
+            <br />
+            <h4>prev sales <input type="number" name="prev_week_sale" /></h4>
+            <h4>prev target <input type="number" name="prev_week_target" /></h4>
+            <h4>prev shrink <input type="number" name="prev_week_shrink" /></h4>
+            <h4>
+              prev shrink target
+              <input type="number" name="prev_week_shrink_target" />
+            </h4>
+            <br />
+            <h3>next week</h3>
+            <br />
+
+            <h4>
+              next sales <input type="number" name="nxt_week_sale_proj" />
+            </h4>
+            <h4>next target <input type="number" name="nxt_week_target" /></h4>
+            <h4>
+              next shrink <input type="number" name="nxt_week_shrink_proj" />
+            </h4>
+            <h4>
+              next shrink target
+              <input type="number" name="nxt_week_shrink_target" />
+            </h4>
+            <input type="submit" value="add" />
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

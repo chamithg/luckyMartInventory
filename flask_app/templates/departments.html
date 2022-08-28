@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='departments.css') }}"
+    />
+  </head>
+  <body class="body">
+    <div class="nav">
+      <li><a href="/dashboard">Home</a></li>
+      <br />
+      <li><a href="/inventory">Inventory</a></li>
+      <br />
+      <li><a href="/departments">Departments</a></li>
+      <br />
+      <li><a href="/targets">Targets</a></li>
+      <br />
+      <li><a href="/sales_plans">Sales Plans</a></li>
+      <br />
+      <li><a href="/logout">Logout</a></li>
+    </div>
+    <div class="main">
+      <h1 class="p-5"><span> All Departmet Sales</span></h1>
+      <div class="col_2 p-5 md-2">
+        <div class="row">
+          <div class="col d-flex justify-content-center">
+            <div>
+              <h3>Previous week Income</h3>
+              <canvas
+                id="myChart1"
+                style="max-width: 350px; max-height: 350px"
+                class="mb-0 pie_chart"
+              ></canvas>
+            </div>
+          </div>
+          <div class="col d-flex justify-content-center">
+            <div>
+              <h3>Next Week Income Proj:</h3>
+              <canvas
+                id="myChart2"
+                style="max-width: 350px; max-height: 350px"
+                class="mb-0 pie_chart"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <table class="table mt-5 table-striped table-hover">
+            <thead>
+              <th>Dept</th>
+              <th>static</th>
+              <th>Previous week</th>
+              <th>Next Week</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td
+                  style="
+                    font-weight: bold;
+                    background-color: rgb(217, 227, 237);
+                  "
+                >
+                  <a href="/department/1"> Meat/Seafood</a>
+                </td>
+                <td>sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{ "$ {:,.2f}".format(meat_totals.total_prev_sales)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_nxt_sales_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sales target</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from sales target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if meat_totals.total_prev_sales < meat_totals.total_prev_sales_target else "text-success" }}>
+                  {{"$ {:,.2f}".format(meat_totals.total_prev_sales
+                  -meat_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if meat_totals.total_nxt_sales_proj < meat_totals.total_nxt_sales_target else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(meat_totals.total_nxt_sales_proj-meat_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink Target (less than)</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_prev_shrink_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_nxt_shrink_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from Shrink Target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if meat_totals.total_prev_shrink_target < meat_totals.total_prev_shrink else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(meat_totals.total_prev_shrink_target-meat_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if meat_totals.total_nxt_shrink_target < meat_totals.total_nxt_shrink_proj else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(meat_totals.total_nxt_shrink_target-meat_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>cost of sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_prev_cost)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_nxt_cost_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Income</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_prev_income)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(meat_totals.total_nxt_income_proj)}}
+                </td>
+              </tr>
+              <!-- produce dept -->
+
+              <tr>
+                <td
+                  style="
+                    font-weight: bold;
+                    background-color: rgb(217, 227, 237);
+                  "
+                >
+                  <a href="/department/2">Produce</a>
+                </td>
+                <td>sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{ "$ {:,.2f}".format(produce_totals.total_prev_sales)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_nxt_sales_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sales target</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from sales target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if produce_totals.total_prev_sales < produce_totals.total_prev_sales_target else "text-success" }}>
+                  {{"$ {:,.2f}".format(produce_totals.total_prev_sales
+                  -produce_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if produce_totals.total_nxt_sales_proj < produce_totals.total_nxt_sales_target else "text-success"}}>
+                  {{"$
+                  {:,.2f}".format(produce_totals.total_nxt_sales_proj-produce_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink Target (less than)</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$
+                  {:,.2f}".format(produce_totals.total_prev_shrink_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_nxt_shrink_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from Shrink Target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if produce_totals.total_prev_shrink_target < produce_totals.total_prev_shrink else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(produce_totals.total_prev_shrink_target-produce_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if produce_totals.total_nxt_shrink_target < produce_totals.total_nxt_shrink_proj else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(produce_totals.total_nxt_shrink_target-produce_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>cost of sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_prev_cost)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_nxt_cost_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Income</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_prev_income)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(produce_totals.total_nxt_income_proj)}}
+                </td>
+              </tr>
+              <!-- Dairy -->
+
+              <tr>
+                <td
+                  style="
+                    font-weight: bold;
+                    background-color: rgb(217, 227, 237);
+                  "
+                >
+                  <a href="department/3"> Dairy</a>
+                </td>
+                <td>sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{ "$ {:,.2f}".format(dairy_totals.total_prev_sales)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_nxt_sales_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sales target</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from sales target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if dairy_totals.total_prev_sales < dairy_totals.total_prev_sales_target else "text-success"}}>
+                  {{"$ {:,.2f}".format(dairy_totals.total_prev_sales
+                  -dairy_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if dairy_totals.total_nxt_sales_proj < dairy_totals.total_nxt_sales_target else "text-success"}}>
+                  {{"$
+                  {:,.2f}".format(dairy_totals.total_nxt_sales_proj-dairy_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink Target (less than)</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_prev_shrink_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_nxt_shrink_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from Shrink Target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if dairy_totals.total_prev_shrink_target < dairy_totals.total_prev_shrink else "text-success" }}
+>
+                  {{"$
+                  {:,.2f}".format(dairy_totals.total_prev_shrink_target-dairy_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if dairy_totals.total_nxt_shrink_target < dairy_totals.total_nxt_shrink_proj else "text-success" }}
+>
+                  {{"$
+                  {:,.2f}".format(dairy_totals.total_nxt_shrink_target-dairy_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>cost of sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_prev_cost)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_nxt_cost_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Income</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_prev_income)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(dairy_totals.total_nxt_income_proj)}}
+                </td>
+              </tr>
+              <!--  -->
+
+              <tr>
+                <td
+                  style="
+                    font-weight: bold;
+                    background-color: rgb(217, 227, 237);
+                  "
+                >
+                  <a href="department/4"> Bakery</a>
+                </td>
+                <td>sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{ "$ {:,.2f}".format(bakery_totals.total_prev_sales)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_nxt_sales_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sales target</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from sales target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if bakery_totals.total_prev_sales < bakery_totals.total_prev_sales_target else "text-success"}}>
+                  {{"$ {:,.2f}".format(bakery_totals.total_prev_sales
+                  -bakery_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if bakery_totals.total_nxt_sales_proj < bakery_totals.total_nxt_sales_target else "text-success"}}
+>
+                  {{"$
+                  {:,.2f}".format(bakery_totals.total_nxt_sales_proj-bakery_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink Target (less than)</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_prev_shrink_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_nxt_shrink_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from Shrink Target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if bakery_totals.total_prev_shrink_target < bakery_totals.total_prev_shrink else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(bakery_totals.total_prev_shrink_target-bakery_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if bakery_totals.total_nxt_shrink_target < bakery_totals.total_nxt_shrink_proj else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(bakery_totals.total_nxt_shrink_target-bakery_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>cost of sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_prev_cost)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_nxt_cost_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Income</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_prev_income)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(bakery_totals.total_nxt_income_proj)}}
+                </td>
+              </tr>
+              <!-- frozen -->
+
+              <tr>
+                <td
+                  style="
+                    font-weight: bold;
+                    background-color: rgb(217, 227, 237);
+                  "
+                >
+                  <a href="department/5"> Frozen</a>
+                </td>
+                <td>sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{ "$ {:,.2f}".format(frozen_totals.total_prev_sales)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_nxt_sales_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sales target</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from sales target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if frozen_totals.total_prev_sales < frozen_totals.total_prev_sales_target else "text-success"}}>
+                  {{"$ {:,.2f}".format(frozen_totals.total_prev_sales
+                  -frozen_totals.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if frozen_totals.total_nxt_sales_proj < frozen_totals.total_nxt_sales_target else "text-success"}}
+>
+                  {{"$
+                  {:,.2f}".format(frozen_totals.total_nxt_sales_proj-frozen_totals.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Shrink Target (less than)</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_prev_shrink_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_nxt_shrink_target)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>varience from Shrink Target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if frozen_totals.total_prev_shrink_target < frozen_totals.total_prev_shrink else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(frozen_totals.total_prev_shrink_target-frozen_totals.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if frozen_totals.total_nxt_shrink_target < frozen_totals.total_nxt_shrink_proj else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(frozen_totals.total_nxt_shrink_target-frozen_totals.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>cost of sales</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_prev_cost)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_nxt_cost_proj)}}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Income</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_prev_income)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(frozen_totals.total_nxt_income_proj)}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {%block javascript%}
+    <script>
+      var meat_totals_js = JSON.parse({{ meat_totals_js | tojson}});
+      var produce_totals_js = JSON.parse({{ produce_totals_js | tojson}});
+      var dairy_totals_js = JSON.parse({{ dairy_totals_js | tojson}});
+      var bakery_totals_js = JSON.parse({{ bakery_totals_js | tojson}});
+      var frozen_totals_js = JSON.parse({{ frozen_totals_js | tojson}});
+
+      // chart 1   doughnut---->
+      const ctx1 = document.getElementById('myChart1');
+            const myChart1 = new Chart(ctx1, {
+              type: 'doughnut',
+              data: {
+              labels: [
+                'Meat',
+                'Produce',
+                'Dairy',
+                'Frozen',
+                'Bakery'
+              ],
+              datasets: [{
+                label: 'My First Dataset',
+
+                data: [meat_totals_js.total_prev_income, produce_totals_js.total_prev_income,dairy_totals_js.total_prev_income,frozen_totals_js.total_prev_income,bakery_totals_js.total_prev_income,],
+                backgroundColor: [
+                  'hsl(244, 100%, 14%)',
+                  'hsl(211, 98%, 19%)',
+                  'hsl(209, 100%, 39%)',
+                  'hsl(198, 82%, 49%)','hsl(186, 52%, 45%)'
+                ],
+                hoverOffset: 4
+              }] //data sets
+            },// data
+
+            });
+      const ctx2 = document.getElementById('myChart2');
+            const myChart2 = new Chart(ctx2, {
+              type: 'doughnut',
+              data: {
+              labels: [
+                'Meat',
+                'Produce',
+                'Dairy',
+                'Frozen',
+                'Bakery'
+              ],
+              datasets: [{
+                label: 'My First Dataset',
+                data: [meat_totals_js.total_nxt_income_proj, produce_totals_js.total_nxt_income_proj,dairy_totals_js.total_nxt_income_proj,frozen_totals_js.total_nxt_income_proj,bakery_totals_js.total_nxt_income_proj,],
+                backgroundColor: [
+                  'hsl(244, 100%, 14%)',
+                  'hsl(211, 98%, 19%)',
+                  'hsl(209, 100%, 39%)',
+                  'hsl(198, 82%, 49%)','hsl(186, 52%, 45%)'
+                ],
+                hoverOffset: 4
+              }]//data sets
+            },//data
+            });
+
+
+
+      // chart 3   bars---->
+    </script>
+    {%endblock%}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

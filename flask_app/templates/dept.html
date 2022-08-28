@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- CSS only -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='item.css') }}"
+    />
+  </head>
+  <body class="body">
+    <div class="nav">
+      <li><a href="/dashboard">Home</a></li>
+      <br />
+      <li><a href="/inventory">Inventory</a></li>
+      <br />
+      <li><a href="/departments">Departments</a></li>
+      <br />
+      <li><a href="/targets">Targets</a></li>
+      <br />
+      <li><a href="/sales_plans">Sales Plans</a></li>
+      <br />
+      <li><a href="/logout">Logout</a></li>
+    </div>
+    <div class="main">
+      <h1 class="p-5"><span> {{dept_data.dept_name}} Department</span></h1>
+      <div class="col_2 p-5 md-2 alerts">
+        <div class="row">
+          <h3>Actions Needed:</h3>
+          <br>
+          <br>
+
+          <!-- sales to prev week warning -->
+          {%if(dept_total.total_prev_sales > dept_total.total_nxt_sales_proj)%}
+          <h4>
+            ** Need aditional sales of {{"$
+            {:,.2f}".format(dept_total.total_prev_sales-dept_total.total_nxt_sales_proj)}}
+            to match previous week.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected sales exceeds previous week sales by {{"$
+            {:,.2f}".format(dept_total.total_nxt_sales_proj-dept_total.total_prev_sales)}}.
+          </h4>
+          {%endif%}
+          <!-- sales to target warning -->
+          {%if(dept_total.total_nxt_sales_target >
+          dept_total.total_nxt_sales_proj)%}
+          <h4>
+            ** Need aditional sales of
+            <span style="color: red"
+              >{{"$
+              {:,.2f}".format(dept_total.total_nxt_sales_target-dept_total.total_nxt_sales_proj)}}</span
+            >
+            to match next week target.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected sales exceeds next week target by {{"$
+            {:,.2f}".format(dept_total.total_nxt_sales_proj-dept_total.total_nxt_sales_target)}}
+          </h4>
+          {%endif%}
+          <!-- shrink to prev week warning -->
+          {%if(dept_total.total_prev_shrink >
+          dept_total.total_nxt_shrink_proj)%}
+          <h4>
+            ** Next week shrink is {{"$
+            {:,.2f}".format(dept_total.total_prev_shrink-dept_total.total_nxt_shrink_proj)}}
+            below than previous week.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected shrink exceeds previous week shrink by  <span style="color: red">{{"$
+            {:,.2f}".format(dept_total.total_nxt_shrink_proj-dept_total.total_prev_shrink)}}.</span></h4>
+          </h4>
+          {%endif%}
+          <!-- shrink to target warning -->
+          {%if(dept_total.total_nxt_shrink_target <
+          dept_total.total_nxt_shrink_proj)%}
+          <h4>
+            ** Need to cut down shrink by 
+            <span style="color: red"
+              >{{"$
+              {:,.2f}".format(dept_total.total_nxt_shrink_proj-dept_total.total_nxt_shrink_target)}}</span
+            >
+            to match next week target.
+          </h4>
+          {%else%}
+          <h4>
+            ** Projected shrink is {{"$
+            {:,.2f}".format(dept_total.total_nxt_shrink_target-dept_total.total_nxt_shrink_proj)}} below than target. 
+          </h4>
+          {%endif%}
+          <a class="btn btn-css mt-5" href="/inventory/dept/{{dept_id}}">Show departments inventory</a>
+        </div>
+        </div>
+
+        <h3 class="p-5"><span> Sales statics as per categories:</span></h3>
+
+          
+          
+
+          {%for cat in cats%}
+          <div class="col_2 p-5 md-2 mb-5">
+          <div class="row mt-2 mb-2">
+          <br>
+          <h4 class="mt-5"><span>{{cat.cat_name}} category</span></h4>
+          <br>
+          <table class="table table-striped table-hover">
+            <thead>
+              <th>***</th>
+              <th style="text-align: right; padding-right:3rem" >Previous week</th>
+              <th style="text-align: right; padding-right:3rem" >Next week</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>sales</td>
+                <td style="text-align: right; padding-right:3rem">
+                  {{ "$ {:,.2f}".format(cat.total_prev_sales)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_nxt_sales_proj)}}
+                </td>
+              </tr>
+              <tr>
+                
+                <td>sales target</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+              
+                <td>varience from sales target</td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if cat.total_prev_sales < cat.total_prev_sales_target else "text-success"}}
+>
+                  {{"$ {:,.2f}".format(cat.total_prev_sales
+                  -cat.total_prev_sales_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if cat.total_nxt_sales_proj < cat.total_nxt_sales_target else "text-success"}}
+>
+                  {{"$
+                  {:,.2f}".format(cat.total_nxt_sales_proj-cat.total_nxt_sales_target)}}
+                </td>
+              </tr>
+              <tr>
+          
+                <td>Shrink</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+            
+                <td>Shrink Target (less than)</td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_prev_shrink_target)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem">
+                  {{"$ {:,.2f}".format(cat.total_nxt_shrink_target)}}
+                </td>
+              </tr>
+              <tr>
+             
+                <td>varience from Shrink Target</td>
+                <td style="text-align: right; padding-right: 3rem" 
+class={{"text-danger" if cat.total_prev_shrink_target < cat.total_prev_shrink else "text-success" }}
+>
+                  {{"$
+                  {:,.2f}".format(cat.total_prev_shrink_target-cat.total_prev_shrink)}}
+                </td>
+                <td style="text-align: right; padding-right: 3rem" class={{"text-danger" if cat.total_nxt_shrink_target < cat.total_nxt_shrink_proj else "text-success" }}>
+                  {{"$
+                  {:,.2f}".format(cat.total_nxt_shrink_target-cat.total_nxt_shrink_proj)}}
+                </td>
+              </tr>
+              <tr>
+            </tbody>
+          </table>
+          </div>
+          <a class="btn btn-warning mt-5" href="/inventory/dept/{{dept_id}}/{{cat.cat_id}}">Show inventory of the catagory</a>
+          </div>
+          {%endfor%}
+
+          
+        
+      
+    </div>
+
+    {%block javascript%}
+    <script>
+      
+    </script>
+    {%endblock%}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
