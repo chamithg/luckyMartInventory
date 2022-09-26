@@ -28,13 +28,12 @@
       <br />
       <li><a href="/departments">Departments</a></li>
       <br />
-      <li><a href="/targets">Targets</a></li>
-      <br />
       <li><a href="/sales_plans">Sales Plans</a></li>
       <br />
       <li><a href="/logout">Logout</a></li>
     </div>
     <div class="main">
+      <h4 class="p-3 text-warning">Logged in:{{session["role"]}}</h4>
       <h1 class="p-5"><span> Itemized sales perfomance</span></h1>
       <div class="col_2 p-5 md-2 alerts">
         <div class="row">
@@ -142,7 +141,7 @@
               <li><h4> Sales Target (Next Week):{{item.nxt_week_target}} UNITS</h4></li>
               <li><h4>Shrink (Next Week): <input type="number" name="nxt_week_shrink_proj" value={{item.nxt_week_shrink_proj}}> UNITS</h4></li>
               <li><h4> Shrink Target-Bellow (Next Week): {{item.nxt_week_shrink_target}}UNITS</h4></li> 
-              <li><h4>Sales Plan</h4><textarea value ={{item.sales_plan}} name="sales_plan" id="sales_plan" cols="56" rows="10"></textarea></li>  
+              <li><h4>Sales Plan:</h4><textarea name="sales_plan" id="sales_plan" cols="56" rows="10"></textarea></li>  
               </ul>
              <input style="width:10rem;" class="btn btn-primary ms-3" type="submit" value="Apply changes">
             </form>
@@ -163,8 +162,8 @@
                 <li><h4> Sales Target (Next Week):{{item.nxt_week_target}} UNITS</h4></li>
                 <li><h4> Shrink (Next Week):{{item.nxt_week_shrink_proj}} UNITS</h4></li>
                 <li><h4> Shrink Target-Bellow (Next Week): {{item.nxt_week_shrink_target}}UNITS</h4></li> 
-                {%if item.sales_plan != none%}
-                <li><h4>Sales plan for next week:</h4><p>{{item.sales_plan}}</p></li>
+                {%if item.sales_plan != ""%}
+                <li><h4  >Sales plan for next week:</h4><p class="p-2"style="background-color: whiteSmoke; border: 3px rgb(205, 199, 199) solid; border-radius:1rem; ">{{item.sales_plan}}</p></li>
                 {%endif%}  
             </ul>
 

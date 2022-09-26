@@ -17,47 +17,82 @@
       href="{{ url_for('static', filename='style.css') }}"
     />
   </head>
-  <body>
-    <div class="container">
+  <body style="background-color: whitesmoke">
+    <div class="d-flex justify-content-center" style="">
       {% with messages = get_flashed_messages() %} {% if messages %} {% for
       message in messages %}
-      <p style="color: rgb(197, 45, 45)">{{message}}</p>
+      <p
+        class="m-5 p-5"
+        style="
+          text-align: center;
+          color: rgb(197, 45, 45);
+          background: radial-gradient(
+            circle,
+            rgba(252, 244, 167, 1) 1%,
+            rgba(222, 135, 110, 1) 100%
+          );
+          border-radius: 2rem;
+          width: 70vw;
+        "
+      >
+        {{message}}
+      </p>
       {% endfor %} {% endif %} {% endwith %}
-      <div class="row">
-        <div class="col">
-          <h1>Register</h1>
-          <form action="/register" method="post">
-            User Name: <br />
-            <input type="text" class="form_control" name="user_name" /><br />
-            Role: <br />
-            <input type="text" class="form_control" name="role" /><br />
-            Flag Code: <br />
-            <input type="text" class="form_control" name="flag_code" /><br />
-            Password: <br />
-            <input type="password" class="form_control" name="password" /><br />
-            Confirm Pasword: <br />
-            <input
-              type="password"
-              class="form_control"
-              name="confirm_password"
-            />
-            <br /><br />
-            <input type="submit" value="Register" class="btn btn-success" />
-          </form>
-        </div>
-        <div class="col">
-          <h1>Login</h1>
-          <form action="/login" method="post">
-            User Name: <br />
-            <input type="" class="form_control" name="user_name" /><br />
-            Password: <br />
-            <input
-              type="password"
-              class="form_control"
-              name="password"
-            /><br /><br />
-            <input type="submit" value="Login" class="btn btn-primary" />
-          </form>
+    </div>
+    <div class="d-flex justify-content-center">
+      <div
+        class="m-5 p-5 d-flex justify-content-center"
+        style="
+          width: 70vw;
+          border-radius: 1rem;
+          background: linear-gradient(
+            90deg,
+            rgba(160, 181, 208, 1) 0%,
+            rgba(78, 164, 182, 1) 18%,
+            rgba(46, 86, 115, 1) 100%
+          );
+        "
+      >
+        <div class="row">
+          <div class="col" style="margin-right: 10rem">
+            <h1>Register</h1>
+            <form action="/register" method="post">
+              User Name: <br />
+              <input type="text" class="form_control" name="user_name" /><br />
+              Role: <br />
+              <input type="text" class="form_control" name="role" /><br />
+              Flag Code: <br />
+              <input type="text" class="form_control" name="flag_code" /><br />
+              Password: <br />
+              <input
+                type="password"
+                class="form_control"
+                name="password"
+              /><br />
+              Confirm Pasword: <br />
+              <input
+                type="password"
+                class="form_control"
+                name="confirm_password"
+              />
+              <br /><br />
+              <input type="submit" value="Register" class="btn btn-success" />
+            </form>
+          </div>
+          <div class="col">
+            <h1>Login</h1>
+            <form action="/login" method="post">
+              User Name: <br />
+              <input type="" class="form_control" name="user_name" /><br />
+              Password: <br />
+              <input
+                type="password"
+                class="form_control"
+                name="password"
+              /><br /><br />
+              <input type="submit" value="Login" class="btn btn-primary" />
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -67,5 +102,7 @@
       integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
       crossorigin="anonymous"
     ></script>
+
+    <
   </body>
 </html>
